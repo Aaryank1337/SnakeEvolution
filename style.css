@@ -213,6 +213,11 @@ main {
   transition: all 0.1s ease; /* Changed from separate transforms/backgrounds to 'all' for simplicity */
   cursor: pointer;
 }
+.game-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    letter-spacing: 0.5px;
+}
 
 .game-btn:active {
   /* 1. Darker background-color */
@@ -301,4 +306,7 @@ footer {
     max-width: 95vw;
     max-height: 89vw;
   }
-}
+}  
+  
+  
+  

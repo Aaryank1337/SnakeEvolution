@@ -147,6 +147,16 @@ const canvas = document.getElementById('gameBoard');
 const ctx = canvas.getContext('2d');
 const box = 20; // cell size
 let snake, direction, nextDirection, food, score, evo, evoActive, evoTimer, gameRunning, frameCount, moveDelay, animationId;
+// 🎵 Preload sound for food consumption
+const foodSound = new Audio('assets/food.mp3');
+
+function playSound(effectName) {
+    if (effectName === 'food') {
+        foodSound.currentTime = 0; 
+        foodSound.play().catch(err => console.log("Audio play error:", err));
+    }
+}
+
 // For Powerup
 let slowTime = null;
 let slowTimeActive = false;
@@ -192,7 +202,17 @@ document.addEventListener('keydown', function (e) {
     if (!gameRunning) { startBtn.click(); }
 });
 
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'a' && direction.x !== 1) nextDirection = { x: -1, y: 0 };
+    if (e.key === 'w' && direction.y !== 1) nextDirection = { x: 0, y: -1 };
+    if (e.key === 'd' && direction.x !== -1) nextDirection = { x: 1, y: 0 };
+    if (e.key === 's' && direction.y !== -1) nextDirection = { x: 0, y: 1 };
 
+    if ((direction.x === 0 && direction.y === 0) && (nextDirection.x !== 0 || nextDirection.y !== 0)) {
+        direction = { ...nextDirection };
+    }
+    if (!gameRunning) { startBtn.click(); }
+});
 
 let bestScore = Number(localStorage.getItem('snake_best') || 0);
 
@@ -337,6 +357,7 @@ function update() {
         score++;
         document.getElementById('score').textContent = score;
         food = randomEmptyTile();
+        playSound('food');
         if (!evo && Math.random() < 0.22) evo = randomEmptyTile();
         if (!slowTime && Math.random() < 0.18) slowTime = randomEmptyTile();
     } else if (evo && head.x === evo.x && head.y === evo.y) {
@@ -398,6 +419,17 @@ const startBtn = document.getElementById('startBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const resetBtn = document.getElementById('resetBtn');
 
+// --- Add button click sound ---
+const clickSound = new Audio('images/click.wav');
+
+[startBtn, pauseBtn, resetBtn].forEach(btn => {
+  btn.addEventListener('click', () => {
+    clickSound.currentTime = 0;
+    clickSound.play();
+  });
+});
+
+
 
 startBtn.onclick = () => {
     if (!gameRunning) {
@@ -417,10 +449,12 @@ pauseBtn.onclick = () => {
         gameRunning = false;
         pauseBtn.textContent = 'Resume';
         document.body.classList.remove('game-active');
+        pauseOverlay.classList.add('show');
     } else {
         gameRunning = true;
         pauseBtn.textContent = 'Pause';
         document.body.classList.add('game-active');
+        pauseOverlay.classList.remove('show');
         if (!animationId) loop();
     }
 };
